@@ -17,15 +17,16 @@ EIF_Parser.ps1 provides the following capability:
 
 # Examples
 Running EvilInjectFinder on the specified IPs in computers.txt 
+    
     PS C:\> .\eif_parser.ps1 -ComputerName c:\users\blue\desktop\computers.txt -EIF_Path "C:\users\blue\desktop\evilinjectfinder.exe"
 
+Running EvilInjectFinder a specified IP.
+    
     PS C:\> .\eif_parser.ps1 -ComputerName 192.168.10.26 -EIF_Path "C:\users\blue\desktop\evilinjectfinder.exe"
 
-    Running EvilInjectFinder a specified IP.
-
-  PS C:\> .\eif_parser.ps1 -ComputerName 127.0.0.1 -EIF_Path "C:\users\blue\desktop\evilinjectfinder.exe"
-
-    Running EvilInjectFinder on the local machine.
+Running EvilInjectFinder on the local machine.
+    
+    PS C:\> .\eif_parser.ps1 -ComputerName 127.0.0.1 -EIF_Path "C:\users\blue\desktop\evilinjectfinder.exe"
 
 
 # Credits
