@@ -15,5 +15,7 @@ EIF_Parser.ps1 provides the following capability:
 - WMI
 - C$
 
+# Examples
+
 # Credits
 Huge thanks to @psmitty7373 for developing Evil Inject Finder.
