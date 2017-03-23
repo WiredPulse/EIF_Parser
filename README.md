@@ -31,3 +31,19 @@ EIF_Parser.ps1 provides the following capability:
 
 # Credits
 Huge thanks to @psmitty7373 for developing Evil Inject Finder.
+
+
+.EXAMPLE
+    .\eif_parser.ps1 -ComputerName c:\users\blue\desktop\computers.txt -EIF_Path "C:\users\blue\desktop\evilinjectfinder.exe"
+
+    Running EvilInjectFinder on the specified IPs in computers.txt 
+
+.EXAMPLE
+    .\eif_parser.ps1 -ComputerName 192.168.10.26 -EIF_Path "C:\users\blue\desktop\evilinjectfinder.exe"
+
+    Running EvilInjectFinder a specified IP.
+
+.EXAMPLE
+    .\eif_parser.ps1 -ComputerName 127.0.0.1 -EIF_Path "C:\users\blue\desktop\evilinjectfinder.exe"
+
+    Running EvilInjectFinder on the local machine.
