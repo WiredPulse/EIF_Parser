@@ -20,7 +20,7 @@ Running EvilInjectFinder on the specified IPs in computers.txt
     
     PS C:\> .\eif_parser.ps1 -ComputerName c:\users\blue\desktop\computers.txt -EIF_Path "C:\users\blue\desktop\evilinjectfinder.exe"
 
-Running EvilInjectFinder a specified IP.
+Running EvilInjectFinder on a specific IP.
     
     PS C:\> .\eif_parser.ps1 -ComputerName 192.168.10.26 -EIF_Path "C:\users\blue\desktop\evilinjectfinder.exe"
 
