@@ -16,4 +16,4 @@ EIF_Parser.ps1 provides the following capability:
 - C$
 
 # Credits
-Huge thanks to Phillip Smith (@psmitty7373) for developing Evil Inject Finder.
+Huge thanks to @psmitty7373 for developing Evil Inject Finder.
