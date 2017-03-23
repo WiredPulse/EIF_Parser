@@ -1,6 +1,7 @@
 # EIF_Parser
 Evil Inject Finder Remote Capability and Parser
 
+# About
 EIF_Parser remotely executes Evil Inject Finder (EIF) on system(s) and presents the processes with 'yes' in the MZ or DOS column of the results back on the local machine.
 
 # Requirements
