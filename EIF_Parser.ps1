@@ -130,6 +130,10 @@ $eif_array = get-content .\eif_results\$computer-5.txt
 
 function EIF_LOCALHOST
     {
+    foreach($line in $eif_array)
+        {
+        $eif_str += $line + $newline
+        }
     # Split text and only grab the chunk(s) containing 'yes'
     $eif = $eif_str -split "`n`r" | Sls 'yes'
 
