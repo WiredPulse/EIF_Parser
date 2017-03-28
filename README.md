@@ -30,4 +30,4 @@ Running EvilInjectFinder on the local machine.
 
 
 # Credits
-Huge thanks to @psmitty7373 for developing Evil Inject Finder.
+Huge thanks to Victor M. Alvarez for developing YARA.
