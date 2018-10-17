@@ -11,6 +11,9 @@
 .PARAMETER EIF_Path
     Specifiy path to evilinjectfinder.exe.
 
+.PARAMETER send_to_splunk
+    takes no input, when set will send raw json over raw tcp to host:port combo configured below
+
 .EXAMPLE
     .\eif_parser.ps1 -ComputerName c:\users\blue\desktop\computers.txt -EIF_Path "C:\users\blue\desktop\evilinjectfinder.exe"
 
@@ -23,6 +26,9 @@
 
 .EXAMPLE
     .\eif_parser.ps1 -ComputerName 127.0.0.1 -EIF_Path "C:\users\blue\desktop\evilinjectfinder.exe"
+
+.Example
+    .\eif_parser.ps1 -ComputerName 192.168.10.26 -EIF_Path "C:\users\blue\desktop\evilinjectfinder.exe" -send_to_splunk
 
     Running EvilInjectFinder on the local machine. 
 
@@ -38,7 +44,15 @@
     |      1210000 | EXECUTE_READWRITE |      964.00KB |              | Yes | Yes |   0% |    0 | C1E8250A8B54B3B7F652026CB61E7196 |
     |      13f0000 | EXECUTE_READWRITE |      396.00KB |              | Yes | Yes |   0% |    0 | 844788136F07F31D5D2E261B509B66ED |
     +------------------------------------------------------------------------------------------------------------------------------+
-
+    #
+    ## splunk outputs as such
+    #
+    {
+    "epid":  "8884",
+    "ts":  1539773315.1699152,
+    "box":  "DC16",
+    "eexe":  "win_met_rev_tcp_9001.exe"
+    }
 .NOTES
     Version:        1.0
     Author:         @wiredPulse or @Wired_Pulse
@@ -51,12 +65,45 @@
 
 param(
     [Parameter(Mandatory=$true)][string]$ComputerName,
-    [Parameter(Mandatory=$true)][string]$EIF_Path
+    [Parameter(Mandatory=$true)][string]$EIF_Path,
+    [Parameter(Mandatory=$false)][switch]$send_to_splunk = $false
      )
 
+$splunk_host = "10.0.100.160"
+$splunk_port = 6666
 $newline = "`r`n"
 New-Item .\EIF_Results -ItemType directory -ErrorAction SilentlyContinue | out-null
 $ErrorActionPreference = "silentlycontinue"
+
+Function send_to_splunk($some_data)
+    {
+    $socket = new-object System.Net.Sockets.TcpClient($splunk_host, $splunk_port)
+    $data = [System.Text.Encoding]::ASCII.GetBytes($some_data)
+    $stream = $socket.GetStream()
+    $stream.Write($data, 0, $data.Length)
+    $stream.Close()
+    }
+
+Function make_json($boxen)
+    {
+    $finds = (get-content .\EIF_Results\$boxen-EIF.txt -ReadCount 1000000000 | foreach { $_ -match "Analysing" })
+    foreach ($lines in $finds.Split([Environment]::NewLine))
+        {
+        $chunks = $lines.split(':')
+        $evil_pid = $chunks[1].Trim()
+        $evil_exe = $chunks[2].Trim()
+        $now = (New-TimeSpan -Start (Get-Date "01/01/1970") -End (Get-Date)).TotalSeconds
+        $json = @{
+            box = $boxen
+            epid = $evil_pid
+            eexe = $evil_exe
+            ts = $now
+            }
+        write-host ($json | ConvertTo-Json)
+        send_to_splunk($json | ConvertTo-Json)
+        }
+    }
+
 
 function EIF_CALL
     {
@@ -83,9 +130,8 @@ function EIF_CALL
             "$computer : Not accessible via WMI" >> .\EIF_Results\_Log.txt
             }
         }
-    sleep 30 
+    sleep 5 
     }
-
 
 Function EIF_RETRIEVE
     {
@@ -102,6 +148,9 @@ Function EIF_RETRIEVE
             }
         # Split text and only grab the chunk(s) containing 'yes'
         $eif = $eif_str -split "`n`r" | Sls 'yes'
+        if ($send_to_splunk) {
+            make_json($computer)
+        }
 
         # File manipulation and output to file
         $eif_cvrt = [string]$eif
@@ -111,12 +160,13 @@ Function EIF_RETRIEVE
             }
         elseif($eif_cvrt -ne $null)
             {
+            Write-Host "Potential EVIL on $computer!!!!" -ForegroundColor Red
             $eif_out = $eif_cvrt.Replace('Analysing', $newlinw +$newline + 'ComputerName: ' + $computer + $newline  + 'Analysing') | out-file .\eif_results\$computer-EIF.txt
             }
         }
 
     write-host "Retrieving data..." -ForegroundColor Cyan
-    sleep 15
+    sleep 5
     remove-item .\eif_results\*5.txt
     }
 
@@ -146,6 +196,11 @@ function EIF_LOCALHOST
     elseif($eif_cvrt -ne $null)
         {
         $eif_out = $eif_cvrt.Replace('Analysing', $newlinw +$newline + 'ComputerName: ' + $computer + $newline  + 'Analysing') | out-file .\eif_results\$env:COMPUTERNAME-EIF.txt
+        if ($send_to_splunk) 
+            {
+            make_json($env:COMPUTERNAME)
+            }
+
         }
     }
 
